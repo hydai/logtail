@@ -13,7 +13,74 @@ A lightweight, password-protected HTTP server for tailing and viewing applicatio
 
 ## Installation
 
-### 1. Activate Virtual Environment
+### Option 1: Docker (Recommended)
+
+#### Prerequisites
+- Docker and Docker Compose installed
+- Log directories created (see below)
+
+#### Quick Start
+
+1. Create log directories:
+```bash
+mkdir -p x402-mvp-dev/data x402-mvp-main/data
+```
+
+2. Start the server:
+```bash
+docker-compose up -d
+```
+
+3. Access the logs at `http://localhost:8080`
+
+#### Customizing Port
+
+Edit `docker-compose.yml` to change the host port:
+```yaml
+ports:
+  - "3000:8080"  # Access via http://localhost:3000
+```
+
+#### Customizing Configuration
+
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` with your desired values:
+```bash
+USERNAME=your_username
+PASSWORD=your_secure_password
+DEFAULT_LINES=1000
+REFRESH_INTERVAL=5
+```
+
+3. Update `docker-compose.yml` to use the `.env` file:
+```yaml
+env_file:
+  - .env
+```
+
+#### Docker Commands
+
+```bash
+# Start server in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f logtail
+
+# Stop server
+docker-compose down
+
+# Rebuild after changes
+docker-compose up -d --build
+```
+
+### Option 2: Native Python
+
+#### 1. Activate Virtual Environment
 
 ```bash
 # macOS/Linux
@@ -23,13 +90,26 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-### 2. Install Dependencies
+#### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Configuration
+
+### Environment Variables (Docker)
+
+All settings can be configured via environment variables in `docker-compose.yml` or `.env` file:
+
+- `USERNAME` - Authentication username (default: admin)
+- `PASSWORD` - Authentication password (default: admin123)
+- `DEFAULT_LINES` - Default number of log lines to display (default: 500)
+- `REFRESH_INTERVAL` - Auto-refresh interval in seconds (default: 10)
+- `LOG_PATH_DEV` - Path to development log file
+- `LOG_PATH_MAIN` - Path to main log file
+
+### Config File (Native Python)
 
 Edit the `config.py` file to modify settings:
 
@@ -104,10 +184,14 @@ Press `Ctrl+C` in the terminal to stop the server.
 ├── server.py           # Main server code
 ├── requirements.txt    # Python dependencies
 ├── README.md          # This file
-├── venv/              # Python virtual environment
-└── x402-mvp-dev/      # Development log directory (needs to be created)
-    └── data/
-        └── app.log
+├── Dockerfile         # Docker image definition
+├── docker-compose.yml # Docker Compose configuration
+├── .dockerignore      # Docker build exclusions
+├── .env.example       # Environment variables template
+├── venv/              # Python virtual environment (for native installation)
+├── x402-mvp-dev/      # Development log directory (needs to be created)
+│   └── data/
+│       └── app.log
 └── x402-mvp-main/     # Main log directory (needs to be created)
     └── data/
         └── app.log
@@ -115,10 +199,12 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Notes
 
-1. Ensure log file paths are correctly configured in `config.py`
-2. If log files don't exist, the page will display a friendly error message
-3. Use a stronger password in production environments
-4. Server binds to `0.0.0.0`, accessible from other devices on the local network
+1. **Docker is recommended** for easier deployment and configuration management
+2. Ensure log file paths are correctly configured (via environment variables for Docker, or `config.py` for native)
+3. If log files don't exist, the page will display a friendly error message
+4. Use a stronger password in production environments
+5. Server binds to `0.0.0.0`, accessible from other devices on the local network
+6. When using Docker, log directories are mounted as volumes for persistence
 
 ## Troubleshooting
 

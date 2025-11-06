@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  logtail:
+    build: .
+    container_name: logtail-server
+    ports:
+      - "8080:8080"  # Change the first port to expose on different host port (e.g., "3000:8080")
+    volumes:
+      # Mount log directories from host to container
+      - ./x402-mvp-dev/data:/app/x402-mvp-dev/data
+      - ./x402-mvp-main/data:/app/x402-mvp-main/data
+    environment:
+      # Authentication settings
+      - USERNAME=admin
+      - PASSWORD=admin123
+
+      # Display settings
+      - DEFAULT_LINES=500
+      - REFRESH_INTERVAL=10
+
+      # Log file paths (relative to container working directory)
+      - LOG_PATH_DEV=x402-mvp-dev/data/app.log
+      - LOG_PATH_MAIN=x402-mvp-main/data/app.log
+    restart: unless-stopped
